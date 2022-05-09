@@ -20,8 +20,13 @@ public class Main {
         //String test = http.sendGet("https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=3ba4c69c0e050af5d80f980dd0864d3c&artist=Cher&album=Believe&format=json");
         String key = "3ba4c69c0e050af5d80f980dd0864d3c";
         // String album = al.getAlbum(http,key);
-        Artiste a = al.getAlbum(http,key);
-        System.out.println(a.toString());
+        Artiste artiste = new Artiste();
+        String test = al.getAlbum(http, key).toString();
+        
+        // artiste = al.getAlbum(http,key);m
+        // Artiste test2 = new Artiste(test);
+        System.out.println(test.toString());
+        // Arrays.stream(persons).forEach(System.out::println);
         //System.out.println(album);
        // System.out.println(test);
         System.out.println("a");

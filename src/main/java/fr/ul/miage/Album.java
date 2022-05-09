@@ -1,6 +1,7 @@
 package fr.ul.miage;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -18,20 +19,22 @@ public class Album {
 
         String url = "https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key="+ key +"&artist=Cher&album=Believe&format=json";
         String res = h.sendGet(url);
-        JsonParser parser = new JsonParser();
-        JsonElement jsonElt = parser.parse(res);
+       // JsonParser parser = new JsonParser();
+       // JsonElement jsonElt = parser.parse(res);
         // System.out.println(jsonElt);
-        String artist = getArtist(jsonElt);
+        // String artist = getArtist(jsonElt);
 
 
-        String jsonString = res;
+        // String jsonString = res;
         Gson g = new Gson();
-        Artiste a = g.fromJson(res, Artiste.class);
+        GsonBuilder gbuilder = new GsonBuilder();
+        Gson g2 = gbuilder.create();
+        Artiste artiste = g2.fromJson(res, Artiste.class);
         // Artiste a = g.fromJson("{\"artist\": typeOfT)
         
 
 
-        return a;
+        return artiste;
 
 
     }
