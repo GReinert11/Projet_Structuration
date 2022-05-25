@@ -1,16 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.ul.miage.Controlleur">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="685.0" prefWidth="929.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.ul.miage.Controlleur">
    <children>
-      <Label layoutX="67.0" layoutY="101.0" text="Album" />
-      <TextField fx:id="txt_album" layoutX="182.0" layoutY="97.0" />
-      <Button fx:id="btn_valider" layoutX="461.0" layoutY="70.0" mnemonicParsing="false" onAction="#validerSaisie" text="Valider" />
-      <Label layoutX="67.0" layoutY="62.0" text="Artiste" />
-      <TextField fx:id="txt_artiste" layoutX="182.0" layoutY="58.0" />
+      <BorderPane layoutX="250.0" layoutY="218.0" prefHeight="685.0" prefWidth="929.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <HBox prefHeight="91.0" prefWidth="452.0" BorderPane.alignment="CENTER">
+               <children>
+                  <RadioButton mnemonicParsing="false" selected="true" text="Informations artistes">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <RadioButton mnemonicParsing="false" text="Informations albums">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <Label text="Artiste">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="txt_artiste">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label disable="true" text="Album">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="txt_album" disable="true">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Button fx:id="btn_valider" mnemonicParsing="false" onAction="#validerSaisie" text="Valider">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+         </top>
+         <center>
+            <Pane prefHeight="555.0" prefWidth="842.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="51.0" layoutY="58.0" text="Statistiques sur l'artiste" />
+                  <Label layoutX="51.0" layoutY="90.0" text="Nombre d'écoutes" />
+                  <Label layoutX="51.0" layoutY="129.0" text="Plays " />
+                  <Label fx:id="lbl_listeners" layoutX="204.0" layoutY="90.0" />
+                  <Label fx:id="lbl_plays" layoutX="149.0" layoutY="129.0" />
+                  <Label layoutX="412.0" layoutY="58.0" text="Autres informations" />
+                  <Label layoutX="412.0" layoutY="90.0" text="Résumé" />
+                  <Label fx:id="lbl_summary" layoutX="558.0" layoutY="90.0" text="Label" />
+                  <TextArea fx:id="txt_summary" layoutX="73.0" layoutY="223.0" prefHeight="200.0" prefWidth="308.0" wrapText="true" />
+                  <TextArea fx:id="txt_similar" layoutX="446.0" layoutY="217.0" prefHeight="213.0" prefWidth="309.0" />
+               </children>
+            </Pane>
+         </center>
+      </BorderPane>
    </children>
 </AnchorPane>

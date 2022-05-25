@@ -2,29 +2,69 @@ package fr.ul.miage;
 
 public class Artiste {
 
-    String artist;
-
-    public Artiste(String artist){
-        this.artist = artist;
+    public Artiste(String name, String playcount, String listener) {
+        this.name = name;
+        this.playcount = playcount;
+        this.listener = listener;
     }
+
+
+
+  /*  public Artiste(String name) {
+        this.name = name;
+    }*/
+
+
+    public Artiste(String name, String playcount) {
+        this.name = name;
+        this.playcount = playcount;
+    }
+    public Artiste(String playcount) {
+        this.playcount = playcount;
+    }
+
+   
+
+
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getPlaycount() {
+        return playcount;
+    }
+    public void setPlaycount(String playcount) {
+        this.playcount = playcount;
+    }
+    public String getListener() {
+        return listener;
+    }
+    public void setListener(String listener) {
+        this.listener = listener;
+    }
+
+
+
+    private String name;
+    private String playcount;
+    private String listener;
+
+   
     public Artiste(){
         super();
     }
 
-    public String getArtist() {
-        return this.artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
+  
     
 
 
     @Override
     public String toString() {
         return "{" +
-            " artist='" + getArtist() + "'" +
+            " artist='" + getName() + "'" +
             "}";
     }
 }
