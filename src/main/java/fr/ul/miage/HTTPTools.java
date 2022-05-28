@@ -88,48 +88,7 @@ import java.io.UnsupportedEncodingException;
         
         
        
-        public static Document getTrackInfo(String artiste,String album,String key) throws UnsupportedEncodingException{
-            Document docLastFm = new Document();
-            MongoDatabase database = connectionToDatabase();
-            String testCollectionAuthors = "GMJGR_auteurs";
-            MongoCollection<Document> collectionAuthors = database.getCollection(testCollectionAuthors);
-            // Préparation de la requête
-            String url = "https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key="+ key +"&artist="+artiste+"&album="+album+"&format=json";
-            HTTPTools httpTools = new HTTPTools();
-            String jsonResponse = httpTools.sendGet(url);
-            //System.out.println(jsonResponse);
-            docLastFm = Document.parse(jsonResponse);
-            // System.out.println(docLastFm);
-            System.out.println(docLastFm.size());
-            for(int i = 0; i < docLastFm.size(); i++){
-                
-                System.out.println(docLastFm.get(1).getClass());
-                System.out.println("a");
-            }
-
-            String json = com.mongodb.util.JSON.serialize(docLastFm);
-        
-           // System.out.println( docLastFm.get("artist",String.class));
-            //System.out.println(docLastFm.getString("artist"));
-
-           
-            // System.out.println(docLastFm.get("artist"));
-            // System.out.println(docLastFm.getString("artist"));
-            Document respDoc = new Document();
-
-            List results = new ArrayList<>();
-            //collection.find(docLastFm).into(results);
-                    
-
-            // Création du JSON à retourner
-                            //Document respDoc = new Document();
-            
-            // Extraction de données de docLastFm et insertion dans respDoc
-            // voir l’API org.bson.Document
-                            ;
-            return docLastFm;
-            
-        }
+       
 
         public static MongoDatabase connectionToDatabase(){
             MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
@@ -269,69 +228,15 @@ import java.io.UnsupportedEncodingException;
 
         }
         
-        public static Document getTopArtists(String key){
-            
-            String url = "https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key="+ key + "&format=json";
-            HTTPTools httpTools = new HTTPTools();
-            String jsonResponse = httpTools.sendGet(url);
-            Document infoArtist = (Document) Document.parse(jsonResponse).get("artists");
-            List<Document> doc2 = (List<Document>) infoArtist.get("artist");
-            List<String> arNames = new ArrayList<>();
-            List<String> arPlaycount = new ArrayList<>();
-            List<String> arListeners = new ArrayList<>();
-            List<Artiste> lartists = new ArrayList<>();
-            List<Integer> arPlaycountTest = new ArrayList<>();
-           // System.out.println(doc2);
-            for(Document doc : doc2){
-                //Artiste ar = new Artiste((String) doc.getString("name"), (String) doc.getString("playcount"), (String) doc.getString("listeners"));
-                //System.out.println(ar);
-                //lartists.add(ar);
-               // System.out.println((String) doc.getString("listeners"));
-                //System.out.println((String) doc.getString("playcount"));
-                String name = (String) doc.get("name");
-             
-
-                String playcount = (String) doc.get("playcount");
-                String listeners = (String) doc.get("listeners");
-                
-                
-                //String listeners = (String) doc.getString("listeners");
-                //Artiste arTest = new Artiste(listeners);
-               // System.out.println(arTest);
-                arNames.add(name);
-                arPlaycount.add(playcount);
-                arListeners.add(listeners);
-                
-            }
-            //System.out.println(names.toString());
-            List<String> namesTen = new ArrayList<>();
-            List<String> playcountTen = new ArrayList<>();
-            List<String> listenersTen = new ArrayList<>();
-            List<Integer> playCountTest = new ArrayList<>();
-            for(int i = 0 ; i <= 10; i++){
-                namesTen.add(arNames.get(i));
-                playcountTen.add(arPlaycount.get(i));
-                listenersTen.add(arListeners.get(i));
-                //System.out.println(playCountTest);
-                Artiste ar = new Artiste(namesTen.get(i), playcountTen.get(i),listenersTen.get(i));
-                //System.out.println(ar);
-                lartists.add(ar);
-            }
-           // System.out.println(namesTen);
-            //System.out.println(playcountTen);
-            //System.out.println(listenersTen);
-            //System.out.println(lartists);
-            //System.out.println(onlyTopTen);
-            //System.out.println(lartists);
-
-            Document lastDoc = new Document();
-            //lastDoc.append("name", name);
+   
+          
+        
     
             
             
-            return lastDoc;
+    
 
-        }
+        
 
         public static JSONObject getTopTracks(String key){
             Document doc = new Document();
