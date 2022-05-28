@@ -50,7 +50,6 @@ public Utilisateur(){
 }
 public static boolean checkIfUserExists(String username){
     MongoDatabase database = HTTPTools.connectionToDatabase();
-    Document documents = (Document) database.getCollection("GMJGR_users").find(Filters.eq("username",username)).first();
     FindIterable<Document> iterable = database.getCollection("GMJGR_users").find(new Document("username", username));
     Iterator iterator = iterable.iterator();
     if(iterator.hasNext()){

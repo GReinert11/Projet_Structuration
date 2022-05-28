@@ -265,7 +265,7 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-            <Tab fx:id="tab_topten" disable="true" text="Top 10 artistes">
+            <Tab fx:id="tab_topartistes" disable="true" text="Top 10 artistes">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -313,6 +313,55 @@
                                     <Label layoutX="803.0" layoutY="144.0" text="Top artistes par pays" />
                                     <Label layoutX="797.0" layoutY="412.0" text="Top musiques par pays" />
                                     <TextArea fx:id="txt_topcountry2" layoutX="658.0" layoutY="446.0" prefHeight="200.0" prefWidth="400.0" />
+                                 </children>
+                              </Pane>
+                           </center>
+                        </BorderPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab fx:id="tab_toptitres" disable="true" text="Top 10 titres">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <BorderPane layoutX="550.0" layoutY="310.0" prefHeight="771.0" prefWidth="1500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <top>
+                              <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label layoutX="65.0" layoutY="39.0" text="Recherche top mondial" />
+                                    <Button fx:id="btn_toptenalbums" layoutX="68.0" layoutY="75.0" mnemonicParsing="false" onAction="#topTenTitres" text="Lancer la recherche" />
+                                    <Label layoutX="602.0" layoutY="39.0" text="Recherche par pays" />
+                                    <TextField fx:id="txt_trackscountry" layoutX="792.0" layoutY="35.0" />
+                                    <Button fx:id="btn_valider5" layoutX="1016.0" layoutY="35.0" mnemonicParsing="false" onAction="#topTenTitresCountry" text="Valider" />
+                                 </children>
+                              </Pane>
+                           </top>
+                           <center>
+                              <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <TextArea fx:id="txt_toptentitres" layoutX="51.0" layoutY="113.0" prefHeight="200.0" prefWidth="289.0" />
+                                    <Label layoutX="176.0" layoutY="73.0" text="Titres" />
+                                    <TextArea fx:id="txt_toptentitres2" layoutX="738.0" layoutY="122.0" prefHeight="200.0" prefWidth="401.0" />
+                                    <Label layoutX="925.0" layoutY="73.0" text="Titres (par pays)" />
+                                 </children>
+                              </Pane>
+                           </center>
+                        </BorderPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab fx:id="tab_toptags" disable="true" text="Top 10 tags">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <BorderPane layoutX="524.0" layoutY="214.0" prefHeight="771.0" prefWidth="1500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <center>
+                              <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Button fx:id="btn_valider6" layoutX="335.0" layoutY="139.0" mnemonicParsing="false" onAction="#topTags" text="Lancher la recherche" />
+                                    <TextArea fx:id="txt_toptags" layoutX="441.0" layoutY="237.0" prefHeight="200.0" prefWidth="453.0" />
                                  </children>
                               </Pane>
                            </center>
@@ -429,11 +478,13 @@
                            <center>
                               <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <TextArea fx:id="txt_validerAvis" layoutX="118.0" layoutY="195.0" prefHeight="200.0" prefWidth="379.0" />
-                                    <Button fx:id="btn_validerAvis" layoutX="638.0" layoutY="270.0" mnemonicParsing="false" onAction="#validerAvis" text="Valider avis" />
-                                    <Button fx:id="btn_afficherAvis" layoutX="118.0" layoutY="66.0" mnemonicParsing="false" onAction="#afficherAvis" text="Afficher la liste d'avis" />
-                                    <Label layoutX="308.0" layoutY="70.0" text="Label" />
-                                    <TextField fx:id="txt_albumavis" layoutX="382.0" layoutY="66.0" />
+                                    <TextArea fx:id="txt_validerAvis" layoutX="118.0" layoutY="195.0" prefHeight="200.0" prefWidth="468.0" />
+                                    <Button fx:id="btn_validerAvis" layoutX="531.0" layoutY="470.0" mnemonicParsing="false" onAction="#validerAvis" text="Valider avis" />
+                                    <Button fx:id="btn_afficherAvis" layoutX="414.0" layoutY="66.0" mnemonicParsing="false" onAction="#afficherAvis" text="Afficher la liste d'avis (non valide)" />
+                                    <Label layoutX="161.0" layoutY="70.0" text="Album" />
+                                    <TextField fx:id="txt_albumavis" layoutX="213.0" layoutY="66.0" />
+                                    <TextField fx:id="txt_choice" layoutX="301.0" layoutY="470.0" />
+                                    <Label layoutX="135.0" layoutY="474.0" text="Id de l'avis à valider" />
                                  </children>
                               </Pane>
                            </center>
