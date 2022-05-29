@@ -121,7 +121,6 @@
                                     <Label fx:id="lbl_plays" layoutX="19.0" layoutY="82.0" />
                                     <Label layoutX="412.0" layoutY="58.0" text="Autres informations" />
                                     <Label layoutX="191.0" layoutY="179.0" text="Résumé" />
-                                    <Label fx:id="lbl_summary" layoutX="558.0" layoutY="90.0" text="Label" />
                                     <TextArea fx:id="txt_summary" layoutX="78.0" layoutY="221.0" prefHeight="200.0" prefWidth="310.0" wrapText="true" />
                                     <TextArea fx:id="txt_similar" layoutX="440.0" layoutY="221.0" prefHeight="200.0" prefWidth="310.0" />
                                     <Label layoutX="549.0" layoutY="179.0" text="Artistes similaires" />
@@ -311,8 +310,6 @@
                                     <Label layoutX="133.0" layoutY="152.0" text="Artistes" />
                                     <TextArea fx:id="txt_topcountry" layoutX="659.0" layoutY="188.0" prefHeight="200.0" prefWidth="400.0" />
                                     <Label layoutX="803.0" layoutY="144.0" text="Top artistes par pays" />
-                                    <Label layoutX="797.0" layoutY="412.0" text="Top musiques par pays" />
-                                    <TextArea fx:id="txt_topcountry2" layoutX="658.0" layoutY="446.0" prefHeight="200.0" prefWidth="400.0" />
                                  </children>
                               </Pane>
                            </center>
@@ -394,16 +391,6 @@
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txt_album4">
-                                       <HBox.margin>
-                                          <Insets left="20.0" top="20.0" />
-                                       </HBox.margin>
-                                    </TextField>
-                                    <Label text="Titre chanson">
-                                       <HBox.margin>
-                                          <Insets left="20.0" top="20.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="txt_chanson4">
                                        <HBox.margin>
                                           <Insets left="20.0" top="20.0" />
                                        </HBox.margin>
@@ -495,7 +482,14 @@
             </Tab>
             <Tab fx:id="tab_administration" disable="true" text="Administration">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="261.0" layoutY="122.0" text="Requêtes par l'API" />
+                        <Label layoutX="899.0" layoutY="131.0" text="Requêtes locales" />
+                        <TextArea fx:id="txt_apirequest" layoutX="100.0" layoutY="244.0" prefHeight="200.0" prefWidth="420.0" />
+                        <TextArea fx:id="txt_localrequest" layoutX="733.0" layoutY="244.0" prefHeight="200.0" prefWidth="420.0" />
+                        <Button fx:id="btn_requete" layoutX="593.0" layoutY="127.0" mnemonicParsing="false" onAction="#afficherRequetes" text="Afficher les requêtes" />
+                     </children></AnchorPane>
               </content>
             </Tab>
         </tabs>

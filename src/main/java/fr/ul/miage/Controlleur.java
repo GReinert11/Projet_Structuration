@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import javax.naming.directory.SearchControls;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.Cursor;
 import com.mongodb.DBCallback;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -69,14 +70,14 @@ public class Controlleur {
     Button btn_toptenalbums;
     @FXML
     Button btn_valider5;
+    @FXML
+    Button btn_requete;
     
     //Labels
     @FXML
     Label lbl_listeners;
     @FXML
     Label lbl_plays;
-    @FXML
-    Label lbl_summary;
     @FXML
     Label lbl_name2;
     @FXML
@@ -126,6 +127,8 @@ public class Controlleur {
     @FXML
     TextField txt_trackscountry;
     
+    
+    
    
    
   
@@ -160,6 +163,10 @@ public class Controlleur {
     TextArea txt_toptentitres2;
     @FXML
     TextArea txt_toptags;
+    @FXML
+    TextArea txt_apirequest;
+    @FXML
+    TextArea txt_localrequest;
 
     //Tab
     @FXML
@@ -191,13 +198,6 @@ public class Controlleur {
         String artiste = txt_artiste.getText();
         String artisteWithoutSpace = checkSpace(artiste);        
         Document docArtiste = getArtistInfo(artiste,key);
-
-        //System.out.println(docArtiste);
-       
-      
-   
-        
-
     }
 
     //Recupérer toutes les informations sur un artistes
@@ -214,10 +214,7 @@ public class Controlleur {
       Document docTest = database.getCollection("GMJGR_auteurs").find(Filters.eq("name",artiste)).first();
       FindIterable<Document> iterable = database.getCollection("GMJGR_auteurs").find(new Document("name", artiste));
       Iterator iterator = iterable.iterator();
-      int count = 0;
-      //System.out.println(docTest);
       if(iterator.hasNext()){ //Vérification si le document existe déjà dans la base de données
-        count = 1;
         txt_summary.appendText((String) docTest.get("summary"));
         Document docArtistsSimilar = (Document) docTest.get("similar");
         Document tags = (Document) docTest.get("tags");
@@ -230,11 +227,12 @@ public class Controlleur {
         for(Document doc : ltags){
           txt_tags.appendText((String) doc.get("name") + "\n");
         }
+        typeRequest("Get artists info", false, user.getUsername());
         return docTest;
 
       }else{ //Si il n'existe pas, on va chercher les informations sur l'api et on insère le document dans la base de données
-        String artisteWithoutSpace = checkSpace(artiste);
-        String url = "https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=" +artisteWithoutSpace +"&api_key=" + key + "&format=json";
+        //String artisteWithoutSpace = checkSpace(artiste);
+        String url = "https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=" +artiste +"&api_key=" + key + "&format=json";
         HTTPTools httpTools = new HTTPTools();
         String jsonResponse = httpTools.sendGet(url);
         Document infoArtist = (Document) Document.parse(jsonResponse).get("artist");
@@ -257,6 +255,7 @@ public class Controlleur {
         last.append("summary", bioArtiste);
         last.append("tags",infoArtist.get("tags"));
         database.getCollection("GMJGR_auteurs").insertOne(last); //Ajout du nouveau document dans la base
+        typeRequest("Get artists info", true, user.getUsername());
         return last;
         
       }
@@ -267,15 +266,12 @@ public class Controlleur {
   public  Document getTrackInfo(String artiste,String album,String key) throws UnsupportedEncodingException{
     Document docLastFm = new Document();
     MongoDatabase database = HTTPTools.connectionToDatabase(); 
-    //database.createCollection("GMJGR_albums");
     Document respDoc = new Document();
     List<Bson> filters = new ArrayList<>();
     filters.add(Filters.eq("name", album));
     filters.add(Filters.eq("artist", artiste));
     Document documents = (Document) database.getCollection("GMJGR_albums").find(Filters.eq("name",album)).first();
     FindIterable<Document> iterable = database.getCollection("GMJGR_albums").find(new Document("name", album));
-   
-    //System.out.println(documents);
     int count = 0;
     Iterator iterator = iterable.iterator();
     if(iterator.hasNext()){
@@ -287,7 +283,6 @@ public class Controlleur {
       lbl_playcount2.setText((String) documents.get("playcount"));
       txt_summary2.appendText((String) documents.get("summary"));
       Document docTracks = (Document) documents.get("tracks");
-    
       List<Document> lTracks = (List<Document>) docTracks.get("track");
       for(Document doc : lTracks){
         Document rank = (Document) doc.get("@attr");
@@ -298,165 +293,184 @@ public class Controlleur {
       for(Document doc : lTags){
         txt_tags2.appendText((String) doc.get("name") + "\n");
       }
+      typeRequest("Get track info", false, user.getUsername());
       return documents;
 
     }else{
-      Document docTest = database.getCollection("GMJGR_albums").find(Filters.eq("name",album)).first();
-       Bson filter1 = Filters.eq("name", album);
-       Bson filter2 = Filters.eq("artist",artiste);
-       FindIterable<Document> iterable2 = database.getCollection("GMJGR_auteurs").find(new Document("name", artiste));
-    
+     
        // Préparation de la requête
        String url = "https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key="+ key +"&artist="+artiste+"&album="+album+"&format=json";
        HTTPTools httpTools = new HTTPTools();
        String jsonResponse = httpTools.sendGet(url);
-       Document infoAlbum = (Document) Document.parse(jsonResponse).get("album");
-       String nameAlbum = (String) infoAlbum.get("name");
-       lbl_name2.setText(nameAlbum);
-       String artistAlbum = (String) infoAlbum.get("artist");
-       lbl_artist2.setText(artistAlbum);
-       Document docWiki = (Document) infoAlbum.get("wiki");
-       String listeners = (String) infoAlbum.get("listeners");
-       lbl_listeners2.setText(listeners);
-       String playcount = (String) infoAlbum.get("playcount");
-       lbl_playcount2.setText(playcount);
-       System.out.println(docWiki);
-       String releaseAlbum = (String) docWiki.get("published");
-       lbl_release2.setText(releaseAlbum);
-       String summary = (String) docWiki.get("summary");
-       txt_summary2.appendText(summary);
+       if(jsonResponse == null){
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle("Infos album");
+        alert.setContentText("Aucune info sur l'album spécifié !");
+        alert.showAndWait();
 
-       Document tags = (Document) infoAlbum.get("tags");
-       List<Document> ltags = (List<Document>) tags.get("tag");
-       for(Document doc : ltags){
-         txt_tags2.appendText((String) doc.get("name") + "\n");
+       }else{
+        Document infoAlbum = (Document) Document.parse(jsonResponse).get("album");
+        String nameAlbum = (String) infoAlbum.get("name");
+        lbl_name2.setText(nameAlbum);
+        String artistAlbum = (String) infoAlbum.get("artist");
+        lbl_artist2.setText(artistAlbum);
+        Document docWiki = (Document) infoAlbum.get("wiki");
+        String listeners = (String) infoAlbum.get("listeners");
+        lbl_listeners2.setText(listeners);
+        String playcount = (String) infoAlbum.get("playcount");
+        lbl_playcount2.setText(playcount);
+        System.out.println(docWiki);
+        String releaseAlbum = (String) docWiki.get("published");
+        lbl_release2.setText(releaseAlbum);
+        String summary = (String) docWiki.get("summary");
+        txt_summary2.appendText(summary);
+ 
+        Document tags = (Document) infoAlbum.get("tags");
+        List<Document> ltags = (List<Document>) tags.get("tag");
+        for(Document doc : ltags){
+          txt_tags2.appendText((String) doc.get("name") + "\n");
+        }
+ 
+        Document tracks = (Document) infoAlbum.get("tracks");
+        List<Document> ltracks = (List<Document>) tracks.get("track");
+        for(Document doc : ltracks){
+          Document rank = (Document) doc.get("@attr");
+          txt_tracks2.appendText((String) doc.get("name") + ", rank : " + (int) rank.get("rank")  + "\n");
+        }
+ 
+        Document last = new Document();
+        last.append("name", nameAlbum);
+        last.append("artist", artistAlbum);
+        last.append("released", releaseAlbum);
+        last.append("summary", summary);
+        last.append("tracks", tracks);
+        last.append("listeners", listeners);
+        last.append("playcount",playcount);
+        last.append("tags", tags);
+        database.getCollection("GMJGR_albums").insertOne(last); //Ajout du nouveau document dans la base
+      
+        typeRequest("Get artists info", true, user.getUsername());
+
        }
-
-       Document tracks = (Document) infoAlbum.get("tracks");
-       List<Document> ltracks = (List<Document>) tracks.get("track");
-       for(Document doc : ltracks){
-         Document rank = (Document) doc.get("@attr");
-         String getNameAlbum = (String) doc.get("name");
-         //int getDurationAlbum = (int) doc.get("duration");
-         int getRank = (int) rank.get("rank");
-         String duration = "null";
-         txt_tracks2.appendText((String) doc.get("name") + ", rank : " + (int) rank.get("rank")  + "\n");
-       }
-
-       Document last = new Document();
-       last.append("name", nameAlbum);
-       last.append("artist", artistAlbum);
-       last.append("released", releaseAlbum);
-       last.append("summary", summary);
-       last.append("tracks", tracks);
-       last.append("listeners", listeners);
-       last.append("playcount",playcount);
-       last.append("tags", tags);
-       database.getCollection("GMJGR_albums").insertOne(last); //Ajout du nouveau document dans la base
      
-
        return docLastFm;
       }
 
     }
 
-    public Utilisateur inscription(String username, String password){
-      Document doc = new Document();
-      Utilisateur user = new Utilisateur();
-
-      return user;
-
-    }
 
     public boolean connexion(String username, String password){
       MongoDatabase db = HTTPTools.connectionToDatabase();
       MongoCollection<Document> dbCollection = db.getCollection("GMJGR_users");
       boolean userExists = Utilisateur.checkIfUserExists(username);
       if(userExists){
-        Document documents = (Document) db.getCollection("GMJGR_users").find(Filters.eq("pseudo",username)).first();
+        Document documents = (Document) db.getCollection("GMJGR_users").find(Filters.eq("username",username)).first();
         String role = (String) documents.get("role");
+      }else{
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle("Connexion");
+        alert.setContentText("Saisir des identifiants valides !");
+        alert.showAndWait();
+
       }
       return true;
   }
 
 
-    public Document getTopByCountry(String country){
+    public Document getTopTenArtistsCountry(String country){
       Document returnDoc = new Document();
       String url = "https://ws.audioscrobbler.com/2.0/?method=geo.gettopartists&country=" + country + "&limit=10&api_key="+ key + "&format=json";
       MongoDatabase db = HTTPTools.connectionToDatabase();
-      MongoCollection dbCollection = db.getCollection("GMJGR_topArtistsByCountry");
+      MongoCursor<Document> cursor = db.getCollection("GMJGR_topArtistsCountry").find(Filters.eq("country",country)).iterator();
 
-      try {
-        Document docToFind = (Document) dbCollection.find(Filters.eq("country",country)).first();
-        FindIterable<Document> iterable = db.getCollection("GMJGR_topArtistsByCountry").find(new Document("country", country));
-        Iterator iterator = iterable.iterator();
-        if(iterator.hasNext()){
-
-        }else{
-
-          HTTPTools httpTools = new HTTPTools();
-          String jsonResponse = httpTools.sendGet(url);
-          Document infoArtist = (Document) Document.parse(jsonResponse).get("topartists");
-          returnDoc.append("country",country);
-          //Document docArtists = (Document) infoArtist.get("artist");
-         
-          List<Document> lDocArtists = (List<Document>) infoArtist.get("artist");
-          System.out.println(lDocArtists);
-          db.getCollection("GMJGR_topArtistsByCountry").insertOne(returnDoc);
-          for(Document doc : lDocArtists){  
-            Document listDocReturn = new Document();
-            String name = (String) doc.get("name");
-            String listeners = (String) doc.get("listeners");
-            listDocReturn.append("country",country);
-            listDocReturn.append("name",name);
-            listDocReturn.append("listeners",listeners);
-            UpdateResult updateQueryResult = dbCollection.updateMany(Filters.eq("country", country),
-            Updates.combine(Updates.set("name",name)));
-            //db.getCollection("GMJGR_topArtistsByCountry").insertOne(listDocReturn);
-            
-          }
-          
-        }   
-      } catch (Exception e) {
-        
+      if(cursor.hasNext()){
+        Document documents = (Document) db.getCollection("GMJGR_topArtistsCountry").find(Filters.eq("country",country)).first();
+        List<Document> lDocs = (List<Document>) documents.get("names");
+        for(Document doc : lDocs){
+          txt_topcountry.appendText("artiste : " + doc.get("name") 
+          + ", listeners : " + doc.get("listeners")
+          + "\n");
+        }
+  
+       typeRequest("Get top ten tracks by country", false, user.getUsername());
+      }else{
+        Document docFinal = new Document();
+        docFinal.append("country", country);
+        HTTPTools httpTools = new HTTPTools();
+        String jsonResponse = httpTools.sendGet(url);
+        Document infoTracks = (Document) Document.parse(jsonResponse).get("topartists");
+        List<Document> listeDocs = (List<Document>) infoTracks.get("artist");
+        List<Document> lDocs = new ArrayList<Document>();
+        for(Document doc : listeDocs){
+          String name = (String) doc.get("name");
+          String listeners = (String) doc.get("listeners");
+         // Document docArtist= (Document) doc.get("artist");
+          //String nameArtist = (String) docArtist.get("name");
+          txt_topcountry.appendText("Nom artiste : " + name  + ", listeners : " + listeners + "\n");
+          Document docToInsert = new Document();
+          docToInsert.append("name",name);
+          docToInsert.append("listeners",listeners);
+          lDocs.add(docToInsert);
+      
+  
       }
+      
+      docFinal.append("names",lDocs);
+      db.getCollection("GMJGR_topArtistsCountry").insertOne(docFinal);
+      typeRequest("Get top ten tracks by country", true, user.getUsername());
+      
+    }
       return returnDoc;
     }
     
     @FXML
     void topArtistsCountry(){
+      txt_topcountry.setText("");
       String country = txt_country.getText();
-      Document docCountry = getTopByCountry(country);      
+      Document docCountry = getTopTenArtistsCountry(country);      
   }
     
-    public Document getTopArtists(String key,String country){
+    public Document getTopArtists(String key){
       Document returnDoc = new Document();
       String url = "https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&limit=10&api_key="+ key + "&format=json";
       MongoDatabase db = HTTPTools.connectionToDatabase();
-      MongoCollection dbCollection = db.getCollection("GMJGR_topArtists");
-      Document docTest = (Document) db.getCollection("GMJGR_topArtists").find();
-      if(docTest != null){
-        System.out.println("yes");
+     // MongoCollection dbCollection = db.getCollection("GMJGR_topArtists");
+     // Document docTest = (Document) db.getCollection("GMJGR_topArtists").find();
+      MongoCursor<Document> cursor = db.getCollection("GMJGR_topArtists").find().iterator();
+      List<Document> listArtists = new ArrayList<Document>();
+      if(cursor.hasNext()){
+        while(cursor.hasNext()){
+          System.out.println("yes");
+          listArtists.add(cursor.next());
+      }
+      for(Document doc : listArtists){
+        txt_artiste3.appendText("name : " + doc.get("name") 
+        + ", playcount : " + doc.get("playcount")
+        + ", listeners : " + doc.get("listeners")
+        + "\n");
+      }
+      typeRequest("Get top ten tracks ", false, user.getUsername());
       }else{
-        System.out.println("nope");
+        HTTPTools httpTools = new HTTPTools();
+        String jsonResponse = httpTools.sendGet(url);
+        Document infoTracks = (Document) Document.parse(jsonResponse).get("artists");
+        List<Document> listeDocs = (List<Document>) infoTracks.get("artist");
+        for(Document doc : listeDocs){
+          String name = (String) doc.get("name");
+          String playcount = (String) doc.get("playcount");
+          String listeners = (String) doc.get("listeners");
+          txt_artiste3.appendText("artiste : " + name + ", playcount : " + playcount + ", listeners : " + listeners + "\n");
+          Document docToInsert = new Document();
+          docToInsert.append("name",name);
+          docToInsert.append("playcount",playcount);
+          docToInsert.append("listeners",listeners);
+          db.getCollection("GMJGR_topArtists").insertOne(docToInsert);
+  
+        }
+  
+        typeRequest("Get top ten tracks ", true, user.getUsername());
       }
-      HTTPTools httpTools = new HTTPTools();
-      String jsonResponse = httpTools.sendGet(url);
-      Document infoArtist = (Document) Document.parse(jsonResponse).get("artists");
-      List<Document> listeDocs = (List<Document>) infoArtist.get("artist");
-      for(int i = 0; i <= 10; i++){
-        String name = (String) listeDocs.get(i).get("name");
-        String playcount = (String) listeDocs.get(i).get("playcount");
-        String listeners = (String) listeDocs.get(i).get("listeners");
-        txt_artiste3.appendText(name + ", playcount : " + playcount + ", listeners : " + listeners + "\n");
-        Document docToInsert = new Document();
-        docToInsert.append("name",name);
-        docToInsert.append("playcount",playcount);
-        docToInsert.append("listeners",listeners);
-        
-        db.getCollection("GMJGR_topArtists").insertOne(docToInsert);
-
-      }
+    
       return returnDoc;
     }
         
@@ -484,14 +498,14 @@ public class Controlleur {
   public void resetControls(){ //Reset les contrôles pour que l'utilisateur puisse lancer plusieurs fois une recherche 
     lbl_listeners.setText("");
     lbl_plays.setText("");
-    lbl_summary.setText("");
+   // lbl_summary.setText("");
     txt_summary.setText("");
     txt_similar.setText("");
   }
 
   @FXML
   void lookTopArtists(){
-    //getTopArtists(key);
+    Document doc = getTopArtists(key);
 
   }
 
@@ -589,11 +603,7 @@ public class Controlleur {
       MongoDatabase database = HTTPTools.connectionToDatabase();
       MongoCollection<Document> dbCollection = database.getCollection("GMJGR_avisAlbums");
       boolean docExist = checkIfAlbumExists(album);
-
-     // Document checkExistComment = (Document) database.getCollection("GMJGR_avisAlbums").find(Filters.eq("name",album)).first();
       FindIterable<Document> checkExistComment = (FindIterable<Document>) database.getCollection("GMJGR_avisAlbums").find(Filters.and(Filters.eq("username",user.getUsername()),Filters.eq("name",album)));
-      //indIterable<Document> iterable2
-      System.out.println(checkExistComment);
         docToinsert.append("artist",artist);
         docToinsert.append("name",album);
         docToinsert.append("comment",comment);
@@ -602,6 +612,7 @@ public class Controlleur {
         docToinsert.append("verif",0);
         dbCollection.insertOne(docToinsert);
         System.out.println("non");
+        typeRequest("Add a comment", false, user.getUsername());
       return docToinsert;
 
     }
@@ -627,6 +638,7 @@ public class Controlleur {
           txt_validerAvis.appendText("ID : " + doc.get("_id")+ ", " + "Utilisateur : " + doc.get("username") + ", Commentaire : " + doc.get("comment") + ", Note :" + doc.get("rate") + "\n");
         } 
       }
+      typeRequest("Get comments info", false, user.getUsername());
       return ldocs;
     }
 
@@ -639,7 +651,6 @@ public class Controlleur {
 
   @FXML
   void validerAvis(){
-    MongoDatabase db = HTTPTools.connectionToDatabase();
     String album = txt_albumavis.getText();
     String choice = txt_choice.getText();
     System.out.println(choice);
@@ -709,7 +720,7 @@ public class Controlleur {
       + ", listeners : " + doc.get("listeners")
       + "\n");
     }
-    
+    typeRequest("Get top ten tracks ", false, user.getUsername());
     }else{
       HTTPTools httpTools = new HTTPTools();
       String jsonResponse = httpTools.sendGet(url);
@@ -731,7 +742,7 @@ public class Controlleur {
 
       }
 
-      System.out.println("nope");
+      typeRequest("Get top ten tracks ", true, user.getUsername());
     }
 
     
@@ -749,9 +760,7 @@ public class Controlleur {
     Document docReturn = new Document();
     MongoDatabase db = HTTPTools.connectionToDatabase();
     String url = "https://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks&country=" +  country + "&limit=10&api_key=" + key + "&format=json";
-    MongoCursor<Document> cursor = db.getCollection("GMJGR_topTracksCountry").find().iterator();
-    MongoCollection dbCollection = db.getCollection("GMJGR_topTracksCountry");
-    List<Document> listTracksCountry = new ArrayList<Document>();
+    MongoCursor<Document> cursor = db.getCollection("GMJGR_topTracksCountry").find(Filters.eq("country",country)).iterator();
     if(cursor.hasNext()){
       Document documents = (Document) db.getCollection("GMJGR_topTracksCountry").find(Filters.eq("country",country)).first();
       List<Document> lDocs = (List<Document>) documents.get("titre");
@@ -762,25 +771,7 @@ public class Controlleur {
         + "\n");
       }
 
-
-     /* List<Document> lFinal = new ArrayList<>();
-      Iterator<Document> cursor2 = lDocs.iterator();
-      while(cursor2.hasNext()){
-        lFinal.add(cursor2.next());
-      }*/
-      //System.out.println(cursor2);
-    /*  while(cursor.hasNext()){
-        listTracksCountry.add(cursor.next());
-
-      }
-      for(Document doc : listTracksCountry){
-        txt_toptentitres2.appendText("titre : " + doc.get("name") 
-        + ", artiste : " + doc.get("nameArtist") 
-        + ", playcount : " + doc.get("playcount")
-        + ", listeners : " + doc.get("listeners")
-        + "\n");
-      }*/
-
+     typeRequest("Get top ten tracks by country", false, user.getUsername());
     }else{
       Document docFinal = new Document();
       docFinal.append("country", country);
@@ -794,31 +785,18 @@ public class Controlleur {
         String listeners = (String) doc.get("listeners");
         Document docArtist= (Document) doc.get("artist");
         String nameArtist = (String) docArtist.get("name");
-        /*UpdateResult updateQueryResult = dbCollection.updateMany(Filters.eq("country", country),
-        Updates.combine(Updates.set("name", name),Updates.set("listeners", listeners),Updates.set("nameArtist", nameArtist )));
-        */
-        txt_toptentitres.appendText("titre : " + name + ", artiste : " + nameArtist  + ", listeners : " + listeners + "\n");
+        txt_toptentitres2.appendText("titre : " + name + ", artiste : " + nameArtist  + ", listeners : " + listeners + "\n");
         Document docToInsert = new Document();
         docToInsert.append("name",name);
         docToInsert.append("listeners",listeners);
         docToInsert.append("nameArtist",nameArtist);
-        /*docFinal.append("name",docToInsert.get("name"));
-        docFinal.append("listeners",docToInsert.get("listeners"));
-        docFinal.append("nameArtist",docToInsert.get("nameArtist"));*/
         lDocs.add(docToInsert);
     
-        //db.getCollection("GMJGR_topTracksCountry").insertOne(docToInsert);
-       
 
     }
+    typeRequest("Get top ten tracks by country", true, user.getUsername());
     docFinal.append("titre",lDocs);
     db.getCollection("GMJGR_topTracksCountry").insertOne(docFinal);
-   
-    
-    
-
-
-
     
   }
   return docReturn;
@@ -845,6 +823,7 @@ public class Controlleur {
       + ", taggins : " + doc.get("taggins")
       + "\n");
     }
+    typeRequest("Get top tags", false, user.getUsername());
   }else{
     String url = "https://ws.audioscrobbler.com/2.0/?method=chart.gettoptags&limit=10&api_key=" + key + "&format=json";
     HTTPTools httpTools = new HTTPTools();
@@ -867,16 +846,11 @@ public class Controlleur {
       
 
     }
+    typeRequest("Get top tags", true, user.getUsername());
 
   }
 
-    
-
-
-
     return docReturn;
-
-
   }
 
   @FXML
@@ -885,23 +859,70 @@ public class Controlleur {
 
   }
 
-  public void typeRequest(String name, boolean fromApi){
+  public void typeRequest(String typeRequest, boolean fromApi,String username){
     MongoDatabase db = HTTPTools.connectionToDatabase();
     MongoCollection dbCollection = db.getCollection("GMJGR_checkRequests");
     Document docReturn = new Document();
     LocalDateTime date = LocalDateTime.now();
-
-    if(fromApi){
-      docReturn.append("nameRequest", name);
-      docReturn.append("date",date);
+    docReturn.append("typeRequest", typeRequest);
+    docReturn.append("username",username);
+    docReturn.append("date",date);
+    if(fromApi){ 
       docReturn.append("type","from API");
     }else{
-      docReturn.append("nameRequest", name);
-      docReturn.append("date",date);
       docReturn.append("type","local");
-
     }
     dbCollection.insertOne(docReturn);
+  }
+
+  public void getLocalRequest(){
+    MongoDatabase db = HTTPTools.connectionToDatabase();
+   
+    //MongoCollection dbCollection = db.getCollection("GMJGR_checkRequests");
+    MongoCursor<Document> cursor = db.getCollection("GMJGR_checkRequests")
+    .find(Filters.eq("type","local"))
+    .limit(10)
+    .iterator();
+    List<Document> ldocs = new ArrayList();
+    if(cursor.hasNext()){
+      while(cursor.hasNext()){
+        ldocs.add(cursor.next());
+      }
+      
+      for(Document doc : ldocs){
+        txt_localrequest.appendText("Type : " + doc.get("typeRequest") + ", username : " + doc.get("username") + ", date : " + doc.get("date") +"\n");
+      }
+      
+    }
+    
+  }
+  public void getApiRequest(){
+    MongoDatabase db = HTTPTools.connectionToDatabase();
+   
+    //MongoCollection dbCollection = db.getCollection("GMJGR_checkRequests");
+    MongoCursor<Document> cursor = db.getCollection("GMJGR_checkRequests")
+    .find(Filters.eq("type","from API"))
+    .limit(10)
+    .iterator();
+    List<Document> ldocs = new ArrayList();
+    if(cursor.hasNext()){
+      while(cursor.hasNext()){
+        ldocs.add(cursor.next());
+      }
+      
+      for(Document doc : ldocs){
+        txt_apirequest.appendText("Type : " + doc.get("typeRequest") + ", username : " + doc.get("username") + ", date : " + doc.get("date") +"\n");
+      }
+      
+    }
+    
+  }
+
+  @FXML
+  void afficherRequetes(){
+    getLocalRequest();
+    getApiRequest();
+
   }
     
 }
